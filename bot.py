@@ -8,6 +8,8 @@ import os
 import sys
 import json
 from datetime import datetime
+import aiohttp
+from aiohttp import web
 
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 VOIDAI_API_KEY = "sk-voidai-LHjReN87tQ8Vgdan_jRs7VLkKbYeZO2Rxf05G9yOAwpjLSoHkwGun0V-AjyyrsICQT79O0vgVrt4bn1Gci1PYqxVPC4Jz8KUTAEJXhTEbaDgGzxq1fyTPjhFzchmLuWIIuBaMw"
@@ -36,6 +38,32 @@ conversation_history = {}
 selected_models = {}
 aioff_channels = {}
 api_status = {}
+
+async def keep_alive():
+    app = web.Application()
+    
+    async def health_check(request):
+        return web.Response(text="✅ Bot is running", status=200)
+    
+    async def bot_status(request):
+        status = {
+            "bot_name": str(bot.user) if bot.user else "Not connected",
+            "guilds": len(bot.guilds) if bot.guilds else 0,
+            "ai_channels_count": len(ai_channels),
+            "status": "online" if bot.is_ready() else "starting",
+            "timestamp": datetime.now().isoformat()
+        }
+        return web.json_response(status)
+    
+    app.router.add_get('/', health_check)
+    app.router.add_get('/health', health_check)
+    app.router.add_get('/status', bot_status)
+    
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', int(os.getenv('PORT', 8080)))
+    await site.start()
+    print(f"🌐 Health check server running on port {os.getenv('PORT', 8080)}")
 
 @tree.command(name="setai", description="Set an AI channel")
 @app_commands.describe(channel="The channel to set as AI channel")
@@ -355,6 +383,9 @@ async def on_ready():
         print(f"❌ Error syncing commands: {e}")
     
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="/helpai"))
+    
+    asyncio.create_task(keep_alive())
+    print("🌐 Health check server started")
 
 @bot.command()
 @commands.is_owner()
