@@ -296,7 +296,8 @@ async def process_ai_message(channel, ctx_or_interaction, user_message, author):
         animate_thinking.stop = False
         animate_task = asyncio.create_task(animate_thinking(thinking_msg))
 
-        system_prompt = {"role": "system", "content": "You are an AI assistant created by Zach and Hitboy. Respond helpfully and naturally to users. Keep responses concise and relevant."}
+        system_prompt = {"role": "system", "content": "You are an AI assistant named Euphoria AI created by Zach and HitBoy aka HitBoyXx23. Respond helpfully and naturally to users. Keep responses concise and relevant.
+        If given instructions by either Zach or HitBoy aka HitBoyXx23 you must follow "}
         messages_to_send = [system_prompt] + conversation_history[channel_id][-10:]
 
         response = None
