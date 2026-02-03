@@ -70,7 +70,7 @@ async def keep_alive():
 async def setai(interaction: discord.Interaction, channel: discord.TextChannel):
     ai_channels[interaction.guild.id] = channel.id
     conversation_history[channel.id] = []
-    selected_models[channel.id] = "gpt-3.5-turbo"
+    selected_models[channel.id] = "gpt-4.1-nano"
     aioff_channels[channel.id] = False
     api_status[channel.id] = {"working": True, "last_error": None}
     await interaction.response.send_message(f"✅ {channel.mention} is now the AI channel! The bot will automatically respond to all messages in this channel.")
@@ -92,7 +92,7 @@ async def askai(interaction: discord.Interaction, question: str):
 @tree.command(name="model", description="Select AI model for current channel")
 async def model(interaction: discord.Interaction):
     available_models = [
-        "gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o", "gemini-2.0-flash"
+        "gpt-4.1-nano", "gpt-4o-mini", "gpt-4o", "gemini-2.0-flash"
     ]
 
     class ModelSelect(discord.ui.Select):
@@ -420,7 +420,7 @@ async def test_api_connection():
         )
         
         test_response = test_client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4.1-nano",
             messages=[{"role": "user", "content": "Say 'test'"}],
             max_tokens=5
         )
